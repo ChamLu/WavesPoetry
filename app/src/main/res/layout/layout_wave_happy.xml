@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.cc.t820.widget.WaveView
+        android:id="@+id/wave1"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:alpha="0.5"
+        app:layout_constraintBottom_toBottomOf="parent" />
+    <com.cc.t820.widget.WaveView
+        android:id="@+id/wave2"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:alpha="0.5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:mVelocity="50"
+        app:mOffsetY="600"
+        app:mScaleX="1" />
+    <com.cc.t820.widget.WaveView
+        android:id="@+id/wave3"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:alpha="0.5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:mVelocity="80"
+        app:mScaleX="0.6" />
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:fontFamily="@font/jxzkttf"
+        android:gravity="center"
+        android:text="待到秋来八九月，我花开后百花杀。冲天香阵透长安，满城尽带黄金甲。"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:focusableInTouchMode="true"
+        android:textSize="42sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="6dp"
+        android:fontFamily="@font/jxzkttf"
+        android:gravity="center"
+        android:text="「不第后赋菊」"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@id/tvAuthor"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvContent" />
+
+    <TextView
+        android:id="@+id/tvAuthor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/tv_bg_red"
+        android:fontFamily="@font/jxzkttf"
+        android:gravity="center"
+        android:text="黄巢"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/tvTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tvTitle" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
