@@ -12,23 +12,13 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 
 /**
- *
- * @ClassName: ContentExt
- * @Author: android 超级兵
- * @CreateDate: 1/7/22$ 5:27 PM$
- * TODO
- */
-
-/**
- * 作者:android 超级兵
- * TODO 获取屏幕宽度
+ *  获取屏幕宽度
  */
 val Context.screenWidth
     get() = resources.displayMetrics.widthPixels
 
 /**
- * 作者:android 超级兵
- * TODO  获取屏幕高度
+ * 获取屏幕高度
  */
 val Context.screenHeight
     get() = resources.displayMetrics.heightPixels

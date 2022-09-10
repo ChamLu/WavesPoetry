@@ -12,7 +12,7 @@ android {
         targetSdk = 32
         versionCode = 1
         versionName = "1.0"
-
+       // multiDexEnabled= true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -39,8 +39,8 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.7.0")
-    implementation("androidx.appcompat:appcompat:1.3.0")
+    implementation("androidx.core:core-ktx:1.8.0")
+    implementation("androidx.appcompat:appcompat:1.5.0")
     implementation("com.google.android.material:material:1.5.0-alpha04")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0-alpha01")
     implementation("androidx.navigation:navigation-fragment-ktx:2.3.5")
@@ -56,4 +56,5 @@ dependencies {
 
     implementation("androidx.core:core-splashscreen:1.0.0-beta02")
 
+//    implementation ("androidx.multidex:multidex:2.0.1")
 }

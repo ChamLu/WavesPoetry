@@ -8,18 +8,21 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.GravityCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.cc.t820.MyApp
 import com.cc.t820.R
 import com.cc.t820.data.Colors
 import com.cc.t820.databinding.ActivityWaveHappyBinding
@@ -33,8 +36,10 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
-
+import kotlinx.coroutines.launch
 
 
 /**
@@ -85,6 +90,9 @@ class WaveHappyActivity : AppCompatActivity() {
                     when (WaveViewState) {
                         is WaveViewState.InitView -> {
                             //进行初始化内容
+                            mBinding.layoutMain.tvContent.setOnClickListener {
+                                mBinding.drawerLayout.openDrawer(GravityCompat.START)
+                            }
                             if (isDarkMode) {
                                 mBinding.leftView.bt1.isChecked = true
                             } else {
@@ -96,24 +104,14 @@ class WaveHappyActivity : AppCompatActivity() {
                             mBinding.leftView.materialButtonGroup.addOnButtonCheckedListener(
                                 materialButton()
                             )
-                            materialButtonSetClick()
+                            mViewModel.dataStory2TextType()
+                       //     materialButtonSetClick()
 
                             mBinding.leftView.edtDelay.hints(mViewModel.mDelay)
 
-                            assets.open("wavesColors.json").use { inputStream ->
-                                JsonReader(inputStream.reader()).use { jsonReader ->
-                                    val colorsType = object : TypeToken<List<Colors>>() {}.type
-                                    mViewModel.colors = Gson().fromJson<MutableList<Colors>?>(
-                                        jsonReader,
-                                        colorsType
-                                    ).filter {
-                                        it.darkSuitable == isDarkMode
-                                    } as MutableList<Colors>
+                            mViewModel.dataStoryGetPoetryToken()
 
-                                }
-                            }
 
-                            getPoetryToken()
 
                             mBinding.leftView.edtDelay.editText?.addTextChangedListener(textW())
 
@@ -123,15 +121,16 @@ class WaveHappyActivity : AppCompatActivity() {
                                     mBinding.leftView.edtDelay.editText?.text.toString().toInt()
 
                                 if (mBinding.leftView.chip.isVisible)
-                                   it.animate()
+                                    it.animate()
                                         .alpha(0f)
                                         .setDuration(1000)
                                         .setListener(object : AnimatorListenerAdapter() {
                                             override fun onAnimationEnd(animation: Animator) {
-                                                it.isVisible=false
+                                                it.isVisible = false
                                             }
                                         })
-                                getPoetryToken()
+                             //   getPoetryToken()
+                                mViewModel.dataStoryGetPoetryToken()
 
                                 mBinding.leftView.edtDelay.hints(mViewModel.mDelay)
 
@@ -140,7 +139,8 @@ class WaveHappyActivity : AppCompatActivity() {
 
                         }
                         is WaveViewState.PoetryToken -> {
-                            setDataStoreToken(WaveViewState.dataBean.token)
+                            mViewModel.setDataStoreToken(WaveViewState.dataBean.token)
+                            mViewModel.dispatch(WaveIntent.PoetryInfo(WaveViewState.dataBean.token))
                         }
 
                         is WaveViewState.PoetryInfo -> {
@@ -159,20 +159,33 @@ class WaveHappyActivity : AppCompatActivity() {
                                     }
                                     mBinding.leftView.tvContent.text = mViewModel.mStr
                                 }
-
                             }
-                            var mRandom = (0 until mViewModel.colors.size).random()
 
+                            if (mViewModel.colorsList().isNotEmpty()) {
+                                val mRandom = (0 until mViewModel.colorsList().size).random()
 
-                            mBinding.layoutMain.wave1.setWaveColor(mViewModel.colors[mRandom].hex.color)
-                            mBinding.layoutMain.wave2.setWaveColor(mViewModel.colors[mRandom].hex.color)
-                            mBinding.layoutMain.wave3.setWaveColor(mViewModel.colors[mRandom].hex.color)
-                            mBinding.leftView.tvColor.text = mViewModel.colors[mRandom].name
-                            mBinding.leftView.tvColor.setTextColor(mViewModel.colors[mRandom].hex.color)
+                                mBinding.layoutMain.wave1.setWaveColor(mViewModel.colorsList()[mRandom].hex.color)
+                                mBinding.layoutMain.wave2.setWaveColor(mViewModel.colorsList()[mRandom].hex.color)
+                                mBinding.layoutMain.wave3.setWaveColor(mViewModel.colorsList()[mRandom].hex.color)
+                                mBinding.leftView.tvColor.text =
+                                    mViewModel.colorsList()[mRandom].name
+                                mBinding.leftView.tvColor.setTextColor(mViewModel.colorsList()[mRandom].hex.color)
+                            }
                         }
-
                     }
                 }
+            }
+        }
+        lifecycleScope.launchWhenStarted {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+
+             mViewModel.textTypeFlow.collect{
+                 if (it == 0) {
+                     mBinding.leftView.btZx.isChecked = true
+                 } else {
+                     mBinding.leftView.btWk.isChecked = true
+                 }
+             }
             }
         }
     }
@@ -207,7 +220,8 @@ class WaveHappyActivity : AppCompatActivity() {
             if (isChecked) {
                 when (checkedId) {
                     R.id.btZx -> {
-                        setTextType(0)
+                        mViewModel.dataStorySetTextType(DataStoryRepository.JXZT)
+
                         val typeface = ResourcesCompat.getFont(this, R.font.jxzt)
                         mBinding.apply {
                             this.leftView.textNavHeader.typeface = typeface
@@ -227,7 +241,8 @@ class WaveHappyActivity : AppCompatActivity() {
                         }
                     }
                     R.id.btWk -> {
-                        setTextType(1)
+                        mViewModel.dataStorySetTextType(DataStoryRepository.XWWK)
+
                         val typeface = ResourcesCompat.getFont(this, R.font.wenkai)
                         mBinding.apply {
                             this.leftView.textNavHeader.typeface = typeface
@@ -275,45 +290,7 @@ class WaveHappyActivity : AppCompatActivity() {
 
     }
 
-    private fun materialButtonSetClick() {
-//
-//        var s1 = 0
-//        // 直到DataStore返回数据为止
-//        runBlocking {
-//            this@WaveHappyActivity.dataStoreT.data.first { setting ->
-//                setting[DataStoreManager.TextType] ?: 0
-//                true
-//            }
-//        }
-//        if (s1 == 0) {
-//            mBinding.leftView.btZx.isChecked = true
-//        } else {
-//            mBinding.leftView.btWk.isChecked = true
-//        }
-
-        lifecycleScope.launchWhenStarted {
-            val s1 = this@WaveHappyActivity.dataStoreT.data.first()[DataStoreManager.TextType] ?: 0
-            if (s1 == 0) {
-                mBinding.leftView.btZx.isChecked = true
-            } else {
-                mBinding.leftView.btWk.isChecked = true
-            }
-        }
-
-    }
-
-    // 目前字体 0 江西拙楷  1
-    private fun setTextType(int: Int) {
-        lifecycleScope.launchWhenStarted {
-            this@WaveHappyActivity.dataStoreT.edit { setting ->
-                if (setting[DataStoreManager.TextType] != int)
-                    setting[DataStoreManager.TextType] = int
-            }
-        }
-    }
-
     private fun getPoetryToken() {
-
         lifecycleScope.launchWhenStarted {
             mViewModel.mToken =
                 this@WaveHappyActivity.dataStoreT.data.first()[DataStoreManager.PoetryToken]
@@ -339,17 +316,6 @@ class WaveHappyActivity : AppCompatActivity() {
 //                mViewModel.dispatch(WaveIntent.PoetryInfo(mViewModel.mToken!!))
 //            }
 //        }
-    }
-
-    private fun setDataStoreToken(str: String) {
-        lifecycleScope.launchWhenStarted {
-            if (str.isNotBlank()) {
-                this@WaveHappyActivity.dataStoreT.edit { setting ->
-                    //写数据
-                    setting[DataStoreManager.PoetryToken] = str
-                }
-            }
-        }
     }
 
     override fun onDestroy() {

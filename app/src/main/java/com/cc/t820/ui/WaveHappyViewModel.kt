@@ -12,7 +12,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
-import kotlin.random.Random
 
 
 /**
@@ -24,9 +23,14 @@ class WaveHappyViewModel : ViewModel() {
         private const val DEFAULT_QUEUE_LENGTH = 1
     }
 
+
     //单例一
     private val mServices by lazy {
         RetrofitBuild.create("https://v2.jinrishici.com/")
+    }
+
+    private val repository by lazy {
+        DataStoryRepository()
     }
 
     /**
@@ -52,9 +56,10 @@ class WaveHappyViewModel : ViewModel() {
 
     val uiFlow = uiState.asSharedFlow()
 
-    var mDelay = 5
 
-    var colors: MutableList<Colors> = mutableListOf()
+    val textTypeFlow = MutableStateFlow<Int>(DataStoryRepository.JXZT)
+
+    var mDelay = 5
 
     var mToken: String? = ""
 
@@ -81,7 +86,6 @@ class WaveHappyViewModel : ViewModel() {
 
         }
     }
-
 
     private fun poetryToken() {
         viewModelScope.launch {
@@ -111,8 +115,11 @@ class WaveHappyViewModel : ViewModel() {
         }
     }
 
-
     private fun delayPoetryInfo(token: String) {
+        if (job != null) {
+            job!!.cancel()
+            job = null
+        }
 
         job = viewModelScope.launch {
             flow {
@@ -126,9 +133,43 @@ class WaveHappyViewModel : ViewModel() {
                 Log.e(TAG, "delayPoetryInfo: ")
                 poetryInfo(token)
             }
+        }
+    }
 
+    fun colorsList(): MutableList<Colors> = repository.colorList()
+
+    fun dataStory2TextType() {
+        viewModelScope.launch {
+            textTypeFlow.value = repository.dataStoryGetTextType()
+            return@launch
         }
 
+    }
 
+    fun dataStorySetTextType(type: Int = DataStoryRepository.JXZT) {
+        viewModelScope.launch {
+            repository.dataStorySetTextType(type)
+        }
+    }
+
+    fun setDataStoreToken(str: String) {
+        viewModelScope.launch {
+            if (str.isNotBlank()) {
+                repository.setDataStoreToken(str)
+            }
+        }
+    }
+
+
+    fun dataStoryGetPoetryToken() {
+        viewModelScope.launch {
+            val s = repository.dataStoryGetPoetryToken()
+            if (!s.isNullOrEmpty()) {
+                delayPoetryInfo(s)
+            } else {
+                poetryToken()
+            }
+            return@launch
+        }
     }
 }
