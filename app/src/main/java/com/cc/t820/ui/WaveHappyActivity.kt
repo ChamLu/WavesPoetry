@@ -18,13 +18,12 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.GravityCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.cc.t820.MyApp
+
+
 import com.cc.t820.R
-import com.cc.t820.data.Colors
 import com.cc.t820.databinding.ActivityWaveHappyBinding
 import com.cc.t820.exts.TAG
 import com.cc.t820.exts.color
@@ -111,8 +110,6 @@ class WaveHappyActivity : AppCompatActivity() {
 
                             mViewModel.dataStoryGetPoetryToken()
 
-
-
                             mBinding.leftView.edtDelay.editText?.addTextChangedListener(textW())
 
                             mBinding.leftView.chip.setOnClickListener {
@@ -139,8 +136,8 @@ class WaveHappyActivity : AppCompatActivity() {
 
                         }
                         is WaveViewState.PoetryToken -> {
-                            mViewModel.setDataStoreToken(WaveViewState.dataBean.token)
-                            mViewModel.dispatch(WaveIntent.PoetryInfo(WaveViewState.dataBean.token))
+//                            mViewModel.setDataStoreToken(WaveViewState.dataBean.token)
+//                            mViewModel.dispatch(WaveIntent.PoetryInfo(WaveViewState.dataBean.token))
                         }
 
                         is WaveViewState.PoetryInfo -> {
@@ -176,6 +173,7 @@ class WaveHappyActivity : AppCompatActivity() {
                 }
             }
         }
+
         lifecycleScope.launchWhenStarted {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
 

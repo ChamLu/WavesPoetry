@@ -3,6 +3,8 @@ package com.cc.t820.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+
+
 import com.cc.t820.data.Colors
 import com.cc.t820.exts.TAG
 import com.cc.t820.net.RetrofitBuild
@@ -93,7 +95,9 @@ class WaveHappyViewModel : ViewModel() {
                 mServices.info().apply {
                     if (this.status == "success") {
                         mToken = this.data.token
-                        uiState.emit(WaveViewState.PoetryToken(this.data))
+                        setDataStoreToken(this.data.token)
+                        delayPoetryInfo(this.data.token)
+                      //  uiState.emit(WaveViewState.PoetryToken(this.data))
                     }
 
                 }

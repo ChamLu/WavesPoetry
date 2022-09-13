@@ -30,16 +30,16 @@ val Context.screenHeight32
 val Context.TAG_CURRENT_THREAD
     get() = "_${this.javaClass.simpleName} thread:[${Thread.currentThread().name}]"
 
-val Context.TAG
+inline val Context.TAG
     get() = "_${this.javaClass.simpleName}"
 
 val View.TAG_CURRENT_THREAD
     get() = "_${this.javaClass.simpleName} thread:[${Thread.currentThread().name}]"
 
-val View.TAG
+inline val View.TAG
     get() = "_${this.javaClass.simpleName}"
 
-val ViewModel.TAG
+inline val ViewModel.TAG
     get() = "_${this.javaClass.simpleName}"
 
 val Int.dp2px1: Int
